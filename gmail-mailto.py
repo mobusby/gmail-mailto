@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ################################################################################
-# Copyright (c) 2011 Mark Busby                                                #
+# Copyright (c) 2011 Mark Busby <www.BusbyCreations.com>                       #
 #                                                                              #
 # This software is licensed under the zlib/libpng license                      #
 #                                                                              #
