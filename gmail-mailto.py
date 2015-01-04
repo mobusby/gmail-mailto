@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 ################################################################################
-# Copyright (c) 2011 Mark Busby <www.BusbyCreations.com>                       #
+# Copyright (c) 2014 Mark Busby <www.BusbyCreations.com>                       #
 #                                                                              #
 # This software is licensed under the zlib/libpng license                      #
 #                                                                              #
@@ -27,14 +27,14 @@
 
 # gmail-mailto.py
 # v. 1.0
-# set this script as your default "mailto" handler.  Opens a chromium-browser 
+# set this script as your default "mailto" handler.  Opens a chromium-browser
 # window in app-mode ready to send a gmail-email.  Also works with google
 # apps account
 #
-# Usage: gmail-mailto.py <url> [google apps account]
+# Usage: gmail-mailto.py [-a google_apps_account] <url>
 # example1: gmail-mailto.py 'mailto:foo@bar.baz?&subject=gmail-mailto.py Rocks!'
 #   will launch a gmail compose page
-# example2: gmail-mailto.py -a BusbyFreelance.com 'mailto:foo@bar.baz&subject=It works G Apps!!!'
+# example2: gmail-mailto.py -a BusbyCreations.com 'mailto:foo@bar.baz&subject=It works with G Apps!!!'
 #   will launch a google apps mail compose page
 # In ubuntu, use this line as your preferred "Mail Reader" gmail-mailto.py [-a appsID] %s
 
@@ -54,12 +54,13 @@ import getopt
 #subject=aSubject&body=aBody"
 
 class launcher:
-	def __init__(self, appsAccount):
+	def __init__(self, chromiumProfile, appsAccount):
 		if (appsAccount != ""):
 			self.baseURL = 'https://mail.google.com/a/' + appsAccount + '/'
 		else:
 			self.baseURL = 'https://mail.google.com/'
-	
+		self.profile = chromiumProfile
+
 	def launch(self, params):
 		cbArg = '--app="' + self.baseURL + 'mail'
 		if (params != ""):
@@ -67,8 +68,8 @@ class launcher:
 			cbArg += '?ui=2&view=cm&tf=0&' + params + '"'
 			#view-source:https://mail.google.com/mail/?ui=2&view=btop&ver=1s4dmo0mhdqld#cmid%253D1
 		else:
-			cbArg += '"'
-		os.system('chromium-browser ' + cbArg)
+			cbArg += '/a/u/0"'
+		os.system('chromium-browser ' + '--profile-directory="' + self.profile + '" ' + cbArg)
 		exit()
 
 class Params:
@@ -89,7 +90,7 @@ class Params:
 		elif (varName == "body"):
 			return self.body
 		return None
-		
+
 	def setVar(self, varName, value):
 		if (varName == "to"):
 			self.toList = value
@@ -102,7 +103,7 @@ class Params:
 		elif (varName == "body"):
 			self.body = value
 		return
-	
+
 	def addToVar(self, varName, value):
 		if (varName == "to"):
 			self.toList += value
@@ -115,7 +116,7 @@ class Params:
 		elif (varName == "body"):
 			self.body += value
 		return
-			
+
 	def add(self, varName, address):
 		if (self.getVar(varName) == ""):
 			self.setVar(varName, address)
@@ -125,11 +126,11 @@ class Params:
 
 def usage(name):
 	print "Usage:"
-	print "\t" + name + " [-a GoogleAppsAccountID] [mailtoURL]"
+	print "\t" + name + " [-p chromiumProfile] [-a GoogleAppsAccountID] [mailtoURL]"
 	exit()
-	
+
 def main():
-	args, urlList = getopt.getopt(sys.argv[1:], "?ha:", "help")
+	args, urlList = getopt.getopt(sys.argv[1:], "?hap:", "help")
 
 	if (len(urlList) > 1):
 		usage(sys.argv[0])
@@ -137,16 +138,19 @@ def main():
 		url = urlList[0].replace('mailto:','') # get rid of mailto:, if present
 	if (len(urlList) < 1):
 		url = ""
-	
-	l = None
+
+	appsID = ""
+	profile = "Default"
 	for opt, val in args:
 		if (opt == "-a"):
-			l = launcher(val)
+			appsID = val
+		if (opt == "-p"):
+			profile = val
 		if (opt in ("-h", "-?", "--help")):
 			usage(sys.argv[0])
-		
-	if (l == None):
-		l = launcher("")
+
+	l = launcher(profile, appsID)
+
 	if (url == ""):
 		l.launch(url);
 
@@ -173,7 +177,7 @@ def main():
 			position = len(url)
 		else:
 			position = regex.search(url).start()
-	
+
 		item = url[0:position]
 		if (item[0:3].lower() == 'to='):
 			p.add("to", item[3:])
@@ -187,7 +191,7 @@ def main():
 			p.setVar("subject", item[3:])
 		elif (item[0:5].lower() == 'body='):
 			p.setVar("body", item[5:])
-	
+
 		if (position == len(url)):
 			url = ""
 		else:

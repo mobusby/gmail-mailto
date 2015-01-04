@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Terminal=false
+Type=Application
+Name=Gmail
+Exec=gmail-mailto.py %s
+Icon=Gmail_logo.png
+StartupWMClass=mail.google.com__mail_ca_u_0
+Categories=Email
+MimeType=application/mbox;message/rfc822;x-scheme-handler/mailto
