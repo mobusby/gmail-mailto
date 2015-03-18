@@ -1,0 +1,1 @@
+A Python script which may be registered as the default handler for "mailto" URI links.  The script launches chromium-browser, in app-mode, with a pre-populated GMail message ready to edit and send.
